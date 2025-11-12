@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: ecm-db-init
+
+  flyway:
+    enabled: false
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+  main:
+    web-application-type: none
+    banner-mode: off
