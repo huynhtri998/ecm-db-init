@@ -32,7 +32,6 @@ SELECT initcap(fn),
 FROM picked
     ON CONFLICT (email) DO NOTHING;
 
--- Mỗi customer có nhiều address (ví dụ 3 address/customer)
 INSERT INTO addresses (street, house_number, zip_code, customer_id)
 SELECT
     CASE g.addr_idx
