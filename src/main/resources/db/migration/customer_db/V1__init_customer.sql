@@ -10,13 +10,13 @@ CREATE TABLE IF NOT EXISTS customers (
                                          created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
--- Each customer can have one address
+-- Customer can have multiple addresses (remove UNIQUE on customer_id)
 CREATE TABLE IF NOT EXISTS addresses (
                                          id            BIGSERIAL PRIMARY KEY,
                                          street        TEXT NOT NULL,
                                          house_number  TEXT NOT NULL,
                                          zip_code      TEXT NOT NULL,
-                                         customer_id   BIGINT UNIQUE REFERENCES customers(id) ON DELETE CASCADE
+                                         customer_id   BIGINT REFERENCES customers(id) ON DELETE CASCADE
     );
 
 -- Indexes for efficient lookups

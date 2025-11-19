@@ -16,23 +16,34 @@ WITH first_names AS (
      ),
      picked AS (
          SELECT row_number() over () AS n, fn, ln
-         FROM (SELECT fn, ln FROM first_names CROSS JOIN last_names ORDER BY fn, ln) t
+         FROM (
+                  SELECT fn, ln
+                  FROM first_names
+                           CROSS JOIN last_names
+                  ORDER BY fn, ln
+              ) t
     LIMIT 30
     )
 INSERT INTO customers (firstname, lastname, email, created_at)
 SELECT initcap(fn),
        initcap(ln),
-       (lower(fn)||'.'||lower(ln)||n::text||'@example.com')::citext,
+       (lower(fn) || '.' || lower(ln) || n::text || '@example.com')::citext,
     now() - (n * interval '1 day')
 FROM picked
     ON CONFLICT (email) DO NOTHING;
 
+-- Mỗi customer có nhiều address (ví dụ 3 address/customer)
 INSERT INTO addresses (street, house_number, zip_code, customer_id)
-SELECT 'Nguyen Trai Street',
-       (100 + id)::text,
-    lpad((70000 + (id % 500))::text,5,'0'),
-       id
-FROM customers
-    ON CONFLICT (customer_id) DO NOTHING;
+SELECT
+    CASE g.addr_idx
+        WHEN 1 THEN 'Nguyen Trai Street'
+        WHEN 2 THEN 'Le Loi Street'
+        ELSE       'Tran Hung Dao Street'
+        END AS street,
+    (100 + c.id + (g.addr_idx - 1) * 10)::text AS house_number,
+    lpad((70000 + ((c.id + g.addr_idx) % 500))::text, 5, '0') AS zip_code,
+    c.id AS customer_id
+FROM customers c
+         CROSS JOIN generate_series(1, 3) AS g(addr_idx);  -- 3 địa chỉ mỗi customer
 
 COMMIT;
